@@ -6,6 +6,7 @@
 #include <QTcpSocket>
 #include <string>
 #include <QtDebug>
+#include <QByteArray>
 #include <unistd.h>
 using namespace std;
 class MyTcpClient : public QObject{
@@ -55,7 +56,7 @@ public:
 
     void write_Data()
     {
-            socket->write("this is a message from tcp client\n");
+            socket->write(QByteArray("this is a message from tcp client\n"));
             qDebug() << "message sended" ;
             //socket->disconnectFromHost();
     }
