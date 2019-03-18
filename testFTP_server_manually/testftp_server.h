@@ -1,0 +1,4 @@
+#ifndef TESTFTP_SERVER_H
+#define TESTFTP_SERVER_H
+
+#endif // TESTFTP_SERVER_H

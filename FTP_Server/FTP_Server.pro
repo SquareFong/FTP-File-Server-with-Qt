@@ -27,4 +27,10 @@ HEADERS += \
     mytcpserver.h \
     mytcpsocket.h \
     ftpserver.h \
-    usermanager.h
+    usermanager.h \
+    ftpcontroller.h \
+    ftpcontroller_server.h \
+    ftpcontroller_socket.h \
+    filemanager.h \
+    ftptransmitter_socket.h \
+    ftptransmitter_server.h
