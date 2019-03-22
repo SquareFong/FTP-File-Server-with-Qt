@@ -7,7 +7,16 @@
 #include<map>
 #include"filemanager.h"
 using namespace std;
+struct TransmitTask{
+public:
+    int status;
+    QString token;
+    vector<QString> filesPath;
+    TransmitTask(int Status, QString Token):
+        status(Status),token(Token){
 
+    }
+};
 class FTPTransmitterSocket : public QObject{
     Q_OBJECT
 private:
@@ -30,7 +39,9 @@ private:
     **/
     map<std::string,int> commands;
 
-    const vector<QString> &tokens;
+    const vector<TransmitTask> &tokens;
+
+    const TransmitTask *task;
 
     FileManager *filemanager;
 signals:
@@ -42,8 +53,10 @@ private:
     bool setToken(QString token){
         //auto it = tokens.begin();
         for(auto &it: tokens){
-            if(it == token ){
+            if(it.token == token ){
                 this->token = token;
+                this->status = it.status;
+                task = &it;
                 return true;
             }
         }
@@ -68,12 +81,21 @@ private:
 
     void DATA(vector<string> &command){
         if(this->token.length() == 0){
-            socket->write("230 please sign in first\n\n");
+            socket->write("not status set\n\n");
             return;
         }else {
             //sent data to client
             if(status < 0){
-
+                for (auto &it:task->filesPath){
+                    QFile file(it);
+                    QByteArray datas(file.readAll());
+                    int t=it.length();
+                    while(--t != '/'){
+                    }
+                    socket->write(it.mid(t+1).append('/').toUtf8());
+                    socket->write(datas);
+                }
+                socket->write("\n\n");
             }else if(status > 0){
 
             }
@@ -168,6 +190,7 @@ private slots:
             socket->write("500 Unknown command\n\n");
         }
     }
+
 public:
     bool setPath(QString filePath){
         this->filePath = filePath;
@@ -192,7 +215,7 @@ public:
         socket->write(data);
     }
 
-    FTPTransmitterSocket(const vector<QString> &Tokens,QTcpSocket *parent):
+    FTPTransmitterSocket(const vector<TransmitTask> &Tokens,QTcpSocket *parent):
         bufferSize(1024),socket(parent),tokens(Tokens){
         connect(this,&FTPTransmitterSocket::disconnected, this,&FTPTransmitterSocket::slotDisconnected);
 

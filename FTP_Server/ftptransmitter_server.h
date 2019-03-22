@@ -5,8 +5,9 @@
 #include<QtNetwork/QTcpServer>
 
 class FTPTransmitterServer : public QTcpServer{
+    Q_OBJECT
 private:
-    vector<QString> tokens;
+    vector<TransmitTask> tokens;
     vector<FTPTransmitterSocket*> ftpsocketList;
 private slots:
     void server_New_Connect(){
@@ -20,8 +21,17 @@ private slots:
         qDebug() << socketDescriptor << "disconnected";
     }
 public slots:
-    void addToken(QString token){
-        tokens.push_back(token);
+    void addToken(int status, QString token){
+        tokens.push_back(TransmitTask(status,token));
+    }
+    void addTask(QString token, QString filePath){
+        auto it = tokens.begin();
+        while(it != tokens.end()){
+            if((*it).token == token){
+                (*it).filesPath.push_back(filePath);
+                return;
+            }
+        }
     }
 public:
     FTPTransmitterServer(uint16_t port){

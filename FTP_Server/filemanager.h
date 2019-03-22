@@ -14,8 +14,18 @@ class FileManager{
     QString rootPath;
     QString relativePath;
     QDir dir;
-
+private:
+    QString jointPath(QString path){
+        if(path[0] == '/'){
+            return rootPath + path.mid(1);
+        }
+        else {
+            return rootPath+relativePath+path;
+        }
+    }
 public:
+
+
     FileManager():relativePath("/"){
 
     }
@@ -117,6 +127,16 @@ public:
             return false;
         }
         file.write(content);
+        return true;
+    }
+
+    bool isFile(QString path){
+        QFileInfo fileinf(jointPath(path));
+        return fileinf.isFile();
+    }
+
+    QString getAbsolutepath(QString path){
+        return jointPath(path);
     }
 };
 

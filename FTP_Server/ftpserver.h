@@ -6,6 +6,8 @@
 
 #include<QThread>
 class FTPServer:public QObject{
+    Q_OBJECT
+private:
     FTPControllerServer *control;
     FTPTransmitterServer *transmitter;
     //QThread *thread;
@@ -14,7 +16,8 @@ public:
         control(new FTPControllerServer(controlPort)),
         transmitter(new FTPTransmitterServer(transferPort))
         {
-
+        connect(control,&FTPControllerServer::addToken,transmitter,&FTPTransmitterServer::addToken);
+        connect(control,&FTPControllerServer::addTask,transmitter,&FTPTransmitterServer::addTask);
     }
 };
 

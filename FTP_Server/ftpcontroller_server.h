@@ -11,6 +11,7 @@
 using namespace std;
 
 class FTPControllerServer : public QTcpServer{
+    Q_OBJECT
 private:
     vector<FTPControllerSocket*> ftpsocketList;
     UserManager usermanager;
@@ -22,14 +23,10 @@ signals:
 
     void addTask(QString token, QString filePath);
 
-private slots:
-    void newToken(int status, QString token){
-        emit addToken(status,token);
-    }
+public slots:
+    void newToken(int status, QString token);
 
-    void newTask(QString token, QString filePath){
-        emit addTask(token,filePath);
-    }
+    void newTask(QString token, QString filePath);
 
     void server_New_Connect(){
         //获取客户端连接
@@ -85,10 +82,7 @@ public:
 //        listen(QHostAddress::Any,port);
 //        connect(this,&FTPControllerServer::newConnection,this,&FTPControllerServer::server_New_Connect);
 //    }
-    FTPControllerServer(uint16_t port){
-        listen(QHostAddress::Any,port);
-        connect(this,&FTPControllerServer::newConnection,this,&FTPControllerServer::server_New_Connect);
-    }
+    FTPControllerServer(uint16_t port);
     ~FTPControllerServer(){
 
     }

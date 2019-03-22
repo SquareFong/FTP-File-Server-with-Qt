@@ -12,6 +12,9 @@
 #include"filemanager.h"
 using namespace std;
 
+
+static int generatorCounter=0;
+
 class FTPControllerSocket : public QObject{
     Q_OBJECT
 private:
@@ -33,7 +36,6 @@ private:
     * ("UL",7)
     **/
     map<std::string,int> commands;
-    static int generatorCounter;
 signals:
     //为内部提供接收信号Qstring:数据，long long:tcp描述符
     void dataReceived(QByteArray);
@@ -235,8 +237,8 @@ private:
                 ++it;
                 QString errorBuff;
                 while(it != command.end()){
-                    if(!fileManager.exists((*it).c_str())){
-                        errorBuff.append(((*it) + " does not exit\n").c_str());
+                    if(!fileManager.isFile((*it).c_str())){
+                        errorBuff.append(("file " + (*it) + " does not exit\n").c_str());
                     }
                     ++it;
                 }
@@ -249,7 +251,7 @@ private:
                     it = command.begin();
                     ++it;
                     while(it != command.end()){
-                        emit addTask(token,(*it).c_str());
+                        emit addTask(token,fileManager.getAbsolutepath((*it).c_str()));
                         ++it;
                     }
                     socket->write(QString("220 token ").append(token).toUtf8());
@@ -397,7 +399,6 @@ public:
     FTPControllerSocket(UserManager *manager, QTcpSocket *parent=nullptr)
         :bufferSize(1024),socket(parent),
           usermanager(manager), isLogin(false){
-        generatorCounter = 0;
         //readyRead()是QIODevice的signal，由QTcpSocket继承而来
         //QTcpSocket被看成一个QIODevice，readyRead()信号在有数据到来时发出。
         connect(socket,&QTcpSocket::readyRead,this, &FTPControllerSocket::readData);
@@ -413,9 +414,10 @@ public:
         commands.insert(pair<string,int>("LS",1));
         commands.insert(pair<string,int>("PWD",2));
         commands.insert(pair<string,int>("CD",3));
-        commands.insert(pair<string,int>("CP",4));
+        commands.insert(pair<string,int>("DL",4));
         commands.insert(pair<string,int>("RM",5));
         commands.insert(pair<string,int>("MKD",6));
+        commands.insert(pair<string,int>("UL",6));
     }
 
     qintptr socketDescriptor() {
