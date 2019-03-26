@@ -97,7 +97,14 @@ private:
                 }
                 socket->write("\n\n");
             }else if(status > 0){
-
+                QFile temp(task->filesPath[0]);
+                if(temp.open(QIODevice::ReadWrite)){
+                    temp.write(command[1].c_str());
+                    socket->write("250 received");
+                }
+                else {
+                    socket->write("550 file open faild");
+                }
             }
         }
     }
