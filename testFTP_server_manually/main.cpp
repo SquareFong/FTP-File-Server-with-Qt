@@ -1,15 +1,14 @@
 #include <QCoreApplication>
-#include "testftp_server.h"
+#include <QtNetwork/QTcpSocket>
+#include "testftpserver.h"
+
 int main(int argc, char *argv[])
 {
     QCoreApplication a(argc, argv);
 
-    testFTPServer *t=new testFTPServer("127.0.0.1",6666);
-//    string c;
-//    while (getline(cin,c)) {
-//        t->write_Data(c+"\n\n");
-//    }
-    QByteArray data("UA anonymous");
-    //emit t->WritetoSocket(data);
+    testFTPServer *socket = new testFTPServer();
+    socket->write("UA anonymous\n\n");
+//    Master *m;
+//    m = new Master();
     return a.exec();
 }
