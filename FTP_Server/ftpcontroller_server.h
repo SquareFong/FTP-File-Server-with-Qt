@@ -15,6 +15,8 @@ class FTPControllerServer : public QTcpServer{
 private:
     vector<FTPControllerSocket*> ftpsocketList;
     UserManager usermanager;
+    int controllerPort;
+    int transmitterPort;
 signals:
     //断开连接
     void disconnected(long long);
@@ -28,12 +30,17 @@ public slots:
 
     void newTask(QString token, QString filePath);
 
+    void setPorts(int controller, int transmitter){
+        transmitterPort=transmitter;
+        controllerPort=controller;
+    }
     void server_New_Connect(){
         //获取客户端连接
         FTPControllerSocket *socket = new FTPControllerSocket(&usermanager,this->nextPendingConnection());
         //socket->setSocketDescriptor(server->nextPendingConnection())
         //连接QTcpSocket的信号槽，以读取新数据
         //QObject::connect(socket, &FTPControllerSocket::readData, this, &FTPControllerServer::socket_Read_Data);
+        socket->setPorts(controllerPort,transmitterPort);
         QObject::connect(socket, &FTPControllerSocket::disconnected, this, &FTPControllerServer::socket_Disconnected);
 
         QObject::connect(socket, &FTPControllerSocket::disconnected, this, &FTPControllerServer::socket_Disconnected);

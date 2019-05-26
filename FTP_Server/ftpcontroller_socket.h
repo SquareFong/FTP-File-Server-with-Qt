@@ -24,6 +24,8 @@ private:
     bool isLogin;
     string username;
     FileManager fileManager;
+    int controllerPort;
+    int transmitterPort;
     //将命令字和数字关联
     /**
     * ("UA",0)
@@ -232,18 +234,12 @@ private:
 
     void download(vector<string> &command){
         if(isLogin){
-            if(command.size() >= 2){
+            if(command.size() == 2){
                 auto it = command.begin();
                 ++it;
-                QString errorBuff;
-                while(it != command.end()){
-                    if(!fileManager.isFile((*it).c_str())){
-                        errorBuff.append(("file " + (*it) + " does not exit\n").c_str());
-                    }
-                    ++it;
-                }
-                if(errorBuff.length() != 0){
-                    socket->write(errorBuff.append("\n\n").toUtf8());
+
+                if(!fileManager.isFile((*it).c_str())){
+                    socket->write(("file " + (*it) + " does not exit\n\n").c_str());
                 }
                 else {
                     QString token=tokenGenerator();
@@ -254,7 +250,7 @@ private:
                         emit addTask(token,fileManager.getAbsolutepath((*it).c_str()));
                         ++it;
                     }
-                    socket->write(QString("220 token ").append(token).toUtf8());
+                    socket->write(QString("220 token:%1 port:%2").arg(token,QString::number(transmitterPort)).toUtf8());
                 }
             }else{
                 socket->write("550 parameters error\n\n");
@@ -267,7 +263,7 @@ private:
 
     void upload(vector<string> &command){
         if(isLogin){
-            if(command.size() >= 2){
+            if(command.size() == 2){
                 auto it = command.begin();
                 ++it;
                 while(it != command.end()){
@@ -418,6 +414,11 @@ public:
         commands.insert(pair<string,int>("RM",5));
         commands.insert(pair<string,int>("MKD",6));
         commands.insert(pair<string,int>("UL",6));
+    }
+
+    void setPorts(int controller, int transmitter){
+        transmitterPort=transmitter;
+        controllerPort=controller;
     }
 
     qintptr socketDescriptor() {

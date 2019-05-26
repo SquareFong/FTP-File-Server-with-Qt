@@ -16,6 +16,7 @@ public:
         control(new FTPControllerServer(controlPort)),
         transmitter(new FTPTransmitterServer(transferPort))
         {
+        control->setPorts(controlPort,transferPort);
         connect(control,&FTPControllerServer::addToken,transmitter,&FTPTransmitterServer::addToken);
         connect(control,&FTPControllerServer::addTask,transmitter,&FTPTransmitterServer::addTask);
     }

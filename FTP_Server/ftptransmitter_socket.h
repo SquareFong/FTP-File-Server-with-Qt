@@ -92,7 +92,7 @@ private:
                     int t=it.length();
                     while(--t != '/'){
                     }
-                    socket->write(it.mid(t+1).append('/').toUtf8());
+                    //socket->write(it.mid(t+1).append('/').toUtf8());
                     socket->write(datas);
                 }
                 socket->write("\n\n");

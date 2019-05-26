@@ -1,6 +1,8 @@
 #include "ftpcontroller_server.h"
 
-FTPControllerServer::FTPControllerServer(uint16_t port){
+FTPControllerServer::FTPControllerServer(uint16_t port):
+controllerPort(0),transmitterPort(0)
+{
     listen(QHostAddress::Any,port);
     connect(this,&FTPControllerServer::newConnection,this,&FTPControllerServer::server_New_Connect);
 }
