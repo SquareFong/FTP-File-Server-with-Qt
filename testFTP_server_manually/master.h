@@ -1,19 +1,15 @@
 #ifndef MASTER_H
 #define MASTER_H
 
-#include"inputmodule.h"
+#include"getfile.h"
 #include"testftpserver.h"
 #include<QObject>
 class Master :  public QObject{
-    InputModule *inp;
+    Q_OBJECT
+    GetFile *file;
     testFTPServer *t;
 public:
-    Master(){
-        inp = new InputModule();
-        t = new testFTPServer();
-        inp->start();
-        connect(inp,&InputModule::emessage,t,&testFTPServer::writeD);
-    }
+    Master();
 };
 
 #endif // MASTER_H

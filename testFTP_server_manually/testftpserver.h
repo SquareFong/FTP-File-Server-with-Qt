@@ -3,30 +3,32 @@
 
 #include <QtNetwork/QTcpSocket>
 #include <QDebug>
+#include <QHostAddress>
 #include <QString>
+#include <QStringList>
 #include <QByteArray>
 #include <string>
 #include <iostream>
 using namespace std;
 class testFTPServer : public QTcpSocket{
+    Q_OBJECT
+private:
+    QString fileName;
+    QHostAddress hostName;
+    //只有上传下载的时候resolve
+    bool resolveCommand(const QString &command,
+                        uint16_t &port,QString &token);
+    bool isResolve;
+signals:
+    void addDownloadTask_test(QHostAddress host, uint16_t port,QString token, QString fileName);
 private slots:
-    void readSocketData(){
-        QByteArray b = readAll();
-        qDebug() << socketDescriptor() << ':' << QString(b);
-        string str;
-        cout << ">>";
-        getline(cin,str);
-        write((str+"\n\n").c_str());
-    }
-public slots:
-    void writeD(const char *s){
-        write(s);
-    }
+    void readSocketData();
+//public slots:
+//    void writeD(const char *s){
+//        write(s);
+//    }
 public:
-    testFTPServer(){
-        connectToHost("127.0.0.1",6666);
-        connect(this,&QTcpSocket::readyRead,this,&testFTPServer::readSocketData);
-    }
+    testFTPServer();
 };
 
 
