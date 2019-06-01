@@ -22,9 +22,9 @@ void GetFile::readSocketData(){
 
 void GetFile::addDownloadTask_testGet(QHostAddress host, uint16_t port,QString token, QString fileName){
     connectToHost(host, port);
+    write(("TOKEN "+(this->token).toStdString() + "\n\n").c_str());
     remotePort = port;
     this->token = token;
     this->fileName = fileName;
-    this->write((QString("TOKEN ").append(this->token).append("\n\n")).toUtf8());
     //qDebug() << host << remotePort << this->token << this->fileName;
 }
