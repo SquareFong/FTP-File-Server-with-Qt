@@ -106,7 +106,7 @@ private:
                 QString buffer;
                 QFileInfoList::iterator it=inf.begin();
                 while(it != inf.end()){
-                    buffer.append((*it).fileName()+"\n");
+                    buffer.append((*it).fileName()+"  ");
                     ++it;
                 }
                 if(buffer.length() != 0){
@@ -122,7 +122,7 @@ private:
                 QString buffer;
                 QFileInfoList::iterator it=inf.begin();
                 while(it != inf.end()){
-                    buffer.append((*it).fileName()+"\n");
+                    buffer.append((*it).fileName()+"  ");
                     ++it;
                 }
                 if(buffer.length() != 0){
@@ -157,7 +157,7 @@ private:
             if(commad.size()==1) {
                 fileManager.changeDirectory();
                 socket->write("250 changed to home\n\n");
-            }//只有一个参数，默认密码为空以继续认证
+            }//
             else if(commad.size() == 2) {
                 if(fileManager.changeDirectory(commad[1].c_str())){
                     socket->write("250 directory changed success\n\n");
@@ -376,6 +376,9 @@ private slots:
             case 7:
                 upload(command);
                 break;
+            case 8:
+                socket->write("200 OK\n\n");
+                break;
             default:
                 socket->write("500 Unknown command\n\n");
                 break;
@@ -413,7 +416,8 @@ public:
         commands.insert(pair<string,int>("DL",4));
         commands.insert(pair<string,int>("RM",5));
         commands.insert(pair<string,int>("MKD",6));
-        commands.insert(pair<string,int>("UL",6));
+        commands.insert(pair<string,int>("UL",7));
+        commands.insert(pair<string,int>("OK",8));
     }
 
     void setPorts(int controller, int transmitter){
