@@ -18,10 +18,13 @@ private:
     QString token;
     QString fileName;
     bool isReceiving;
+    bool isSending;
 public slots:
     void addDownloadTask_testGet(QHostAddress host, uint16_t port,QString token, QString fileName);
+    void addUploadTask(QHostAddress host, uint16_t port,QString token, QString fileName);
 private slots:
     void readSocketData();
+    void waitforRead();
 public:
     GetFile();
 };

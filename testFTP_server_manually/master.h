@@ -8,6 +8,8 @@ class Master :  public QObject{
     Q_OBJECT
     GetFile *file;
     testFTPServer *t;
+private slots:
+    void sendToken(QString token);
 public:
     Master();
 };

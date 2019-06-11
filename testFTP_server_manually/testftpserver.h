@@ -19,8 +19,12 @@ private:
     bool resolveCommand(const QString &command,
                         uint16_t &port,QString &token);
     bool isResolve;
+    bool down;
+    bool up;
 signals:
+    void addUploadTask_test(QHostAddress host, uint16_t port,QString token, QString fileName);
     void addDownloadTask_test(QHostAddress host, uint16_t port,QString token, QString fileName);
+    void sendToken(QString token);
 private slots:
     void readSocketData();
 //public slots:

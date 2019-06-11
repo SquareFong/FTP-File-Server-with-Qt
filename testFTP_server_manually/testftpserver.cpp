@@ -1,10 +1,11 @@
 #include "testftpserver.h"
-
-testFTPServer::testFTPServer():isResolve(false){
+#include<unistd.h>
+testFTPServer::testFTPServer():isResolve(false),down(false),up(false){
     connectToHost("127.0.0.1",6666);
     hostName = QHostAddress("127.0.0.1");
     connect(this,&QTcpSocket::readyRead,this,&testFTPServer::readSocketData);
 }
+
 bool testFTPServer::resolveCommand(const QString &command, uint16_t &port, QString &token){
     if(isResolve){
         isResolve = false;
@@ -36,7 +37,12 @@ void testFTPServer::readSocketData(){
         if(resolveCommand(b,port,token))
         {
             qDebug() << hostName << port << token << fileName;
-            emit addDownloadTask_test(hostName, port, token, fileName);
+            if(down) {
+                emit addDownloadTask_test(hostName, port, token, fileName);
+            }
+            else if(up){
+                emit addUploadTask_test(hostName, port, token, fileName);
+            }
         }
     }
 
@@ -44,6 +50,11 @@ void testFTPServer::readSocketData(){
     cout << ">>";
     getline(cin,str);
     if(str.substr(0,2) == "DL" || str.substr(0,2) == "UL") {
+        if(str.substr(0,2) == "DL")
+            down = true;
+        else {
+            up = true;
+        }
         fileName = QString::fromStdString(str.substr(3));
         isResolve = true;
         qDebug() << "filename:" << fileName;
