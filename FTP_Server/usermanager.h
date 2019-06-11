@@ -14,6 +14,8 @@ public:
     UserManager(){
         users.push_back("anonymous");
         passwd.push_back("");
+        users.push_back("square");
+        passwd.push_back("987654");
     }
     bool authentication(string username, string password=""){
         auto it1=users.begin();

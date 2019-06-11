@@ -62,6 +62,7 @@ private:
         }
         return false;
     }
+
     void TOKEN(vector<string> &command){
         if(this->token.length() != 0){
             socket->write("530 already signed in\n\n");
@@ -81,24 +82,28 @@ private:
 
     void DATA(vector<string> &command){
         if(this->token.length() == 0){
-            socket->write("not status set\n\n");
+            socket->write("530 not status set\n\n");
             return;
         }else {
             //sent data to client
             if(status < 0){
                 for (auto &it:task->filesPath){
                     QFile file(it);
-                    QByteArray datas(file.readAll());
-                    int t=it.length();
-                    while(--t != '/'){
+                    if(file.open(QIODevice::ReadOnly)){
+                        while (!file.atEnd()) {
+                            QByteArray datas=file.read(1000);
+                            socket->write(datas);
+                            socket->waitForBytesWritten(1000);
+                        }
+                    }else {
+                        socket->write("500 fail to open the file\n\n");
                     }
                     //socket->write(it.mid(t+1).append('/').toUtf8());
-                    socket->write(datas);
                 }
-                socket->write("\n\n");
+                socket->write("DATAEND\n\n");
             }else if(status > 0){
                 QFile temp(task->filesPath[0]);
-                if(temp.open(QIODevice::ReadWrite)){
+                if(temp.open(QIODevice::ReadWrite|QIODevice::Append)){
                     temp.write(command[1].c_str());
                     socket->write("250 received");
                 }
@@ -137,10 +142,12 @@ private slots:
         if (socket->bytesAvailable() > 0) {
             // 还有数据在socket中
             qDebug() << socket->socketDescriptor() << ":too much data";
+            //socket->readAll();
             //返回错误信息
-            //socket->write("");
+            socket->write("500\n\n");
         }
-        else {
+
+        {
             //数据读取完成
             --p;
             *p=0;
@@ -169,13 +176,15 @@ private slots:
                     s=temp.begin();
                     firstBlank = false;
                 }
+            }else {
+                *s = *it;
+                ++s;
             }
             ++it;
         }
 
-        if(s!=temp.begin()) {
-            command.push_back(temp.substr(0,ulong(s-temp.begin())));
-        }
+        command.push_back(temp.substr(0,ulong(s-temp.begin())));
+
 
         //处理分好的词
         /**
@@ -196,6 +205,8 @@ private slots:
         else {
             socket->write("500 Unknown command\n\n");
         }
+
+
     }
 
 public:
@@ -225,7 +236,7 @@ public:
     FTPTransmitterSocket(const vector<TransmitTask> &Tokens,QTcpSocket *parent):
         bufferSize(1024),socket(parent),tokens(Tokens){
         connect(this,&FTPTransmitterSocket::disconnected, this,&FTPTransmitterSocket::slotDisconnected);
-
+        connect(this,&FTPTransmitterSocket::dataReceived,this,&FTPTransmitterSocket::processData);
         connect(socket, &QTcpSocket::readyRead, this,&FTPTransmitterSocket::readData);
 
         //初始化命令和

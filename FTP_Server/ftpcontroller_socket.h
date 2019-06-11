@@ -2,7 +2,9 @@
 #define FTPCONTROLLER_SOCKET_H
 
 #include <QtNetwork/QTcpSocket>
+#include <QtNetwork/QHostAddress>
 #include <QObject>
+#include <QString>
 #include <string>
 #include <vector>
 #include <map>
@@ -75,6 +77,8 @@ private:
                 username=commad[1];
                 isLogin = true;
                 fileManager.setRoot("/home/square/Share/");
+                qDebug() << "User" << commad[1].c_str() << "login successfully from" ;
+                qDebug() << "IP:" << socket->peerAddress() << "Port:" << socket->peerPort();
                 socket->write("230\n\n");
             }
             else{
@@ -87,6 +91,8 @@ private:
                 username=commad[1];
                 isLogin = true;
                 fileManager.setRoot("/home/square/Share/");
+                qDebug() << "User" << commad[1].c_str() << "login successfully from" ;
+                qDebug() << "IP:" << socket->peerAddress() << "Port:" << socket->peerPort();
                 socket->write("230\n\n");
             }
             else {
@@ -264,12 +270,15 @@ private:
     void upload(vector<string> &command){
         if(isLogin){
             if(command.size() == 2){
+                QString token=tokenGenerator();
+                emit addToken(1, token);
                 auto it = command.begin();
                 ++it;
                 while(it != command.end()){
-                    emit receiveFile(&fileManager, (*it).c_str());
+                    emit addTask(token,fileManager.getAbsolutepath((*it).c_str()));
                     ++it;
                 }
+                socket->write(QString("220 token:%1 port:%2").arg(token,QString::number(transmitterPort)).toUtf8());
             }else{
                 socket->write("550 parameters error\n\n");
             }
@@ -387,6 +396,8 @@ private slots:
         else {
             socket->write("500 Unknown command\n\n");
         }
+        socket->waitForBytesWritten(1000);
+        socket->waitForReadyRead(3000);
     }
 
     void slotDisconnected() {

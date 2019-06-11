@@ -20,7 +20,23 @@ private:
             return rootPath + path.mid(1);
         }
         else {
-            return rootPath+relativePath+path;
+            QString tPath(rootPath);
+            if(tPath[tPath.length()-1] == '/' && relativePath[0] == '/'){
+                if(relativePath.length()>1){
+                    tPath.append(relativePath.mid(1));
+                }
+            }
+            else {
+                tPath.append(relativePath);
+            }
+            if(tPath[tPath.length()-1] == '/' && path[0] == '/'){
+                if(path.length()>1){
+                    tPath.append(path.mid(1));
+                }
+            }else {
+                tPath.append(path);
+            }
+            return tPath;
         }
     }
 public:
